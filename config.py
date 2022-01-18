@@ -262,7 +262,7 @@ screens = [
                     fontsize=16,
                 ),
                 widget.Clock(
-                    format="%b %d",
+                    format="%A %b %d",
                     fontsize=18,
                 ),
                 widget.Sep(
