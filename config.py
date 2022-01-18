@@ -24,7 +24,7 @@ keys = [
     Key([mod], "l", lazy.layout.right(), desc="Move focus to right"),
     Key([mod], "j", lazy.layout.down(), desc="Move focus down"),
     Key([mod], "k", lazy.layout.up(), desc="Move focus up"),
-    Key([mod], "f", lazy.window.toggle_fullscreen(), desc="toggle fullscreen"),
+    Key([mod, "shift"], "f", lazy.window.toggle_fullscreen(), desc="toggle fullscreen"),
     Key([mod], "space", lazy.window.toggle_floating(), desc="toggle floating"),
     Key([mod], "Tab", lazy.next_layout(), desc="Toggle between layouts"),
     # --------------------- Shuffle windows ---------------------------------
@@ -60,8 +60,8 @@ keys = [
     Key([mod], "n", lazy.layout.normalize(), desc="Reset all window sizes"),
     # ------------ Restart,Shutdown & Kill------------------------------
     Key([mod, "control"], "r", lazy.restart(), desc="Restart Qtile"),
-    Key([mod], "x", lazy.spawn("betterlockscreen -l blur"), desc="lockscreen"),
     Key([mod], "q", lazy.window.kill(), desc="Kill focused window"),
+    Key([mod, "shift"], "x", lazy.spawn("powermenu.sh"), desc="Kill focused window"),
     # -------------------------Spawn apps/programs-----------------------------
     Key([mod], "Return", lazy.spawn(terminal), desc="Spawn a terminal"),
     Key([mod], "d", lazy.spawn("rofi -show drun"), desc="Spawn rofi"),
@@ -81,8 +81,8 @@ keys = [
     Key([], "XF86AudioNext", lazy.spawn("playerctl next")),
     Key([], "XF86AudioPrev", lazy.spawn("playerctl previous")),
     Key([], "XF86AudioStop", lazy.spawn("playerctl stop")),
-    Key([mod], "Down", lazy.spawn("playerctl --player mpd volume 0.1-")),
-    Key([mod], "Up", lazy.spawn("playerctl --player mpd volume 0.1+")),
+    Key(["mod1"], "j", lazy.spawn("playerctl --player mpd volume 0.1-")),
+    Key(["mod1"], "k", lazy.spawn("playerctl --player mpd volume 0.1+")),
     Key([], "XF86MonBrightnessUp", lazy.spawn("xbacklight -inc 5")),
     Key([], "XF86MonBrightnessDown", lazy.spawn("xbacklight -dec 5")),
 ]
@@ -110,21 +110,6 @@ for i in groups:
         ]
     )
 # --------------------------------- Colors -------------------------------
-# ----------------Pywal-------------------
-# colors = []
-# cache = "/home/riddle/.cache/wal/colors"
-#
-#
-# def load_colors(cache):
-#     with open(cache, "r") as file:
-#         for i in range(8):
-#             colors.append(file.readline().strip())
-#     colors.append("#ffffff")
-#     lazy.reload()
-#
-#
-# load_colors(cache)
-
 
 def init_colors():
     return [
@@ -258,7 +243,7 @@ screens = [
                 ),
                 widget.TextBox(
                     text=" ",
-                    font="Font Awesome",
+                    font="JetBrainsMono Nerd Font",
                     fontsize=16,
                 ),
                 widget.PulseVolume(
@@ -309,8 +294,6 @@ screens = [
             30,
             margin=[10, 10, 10, 10],
         ),
-        wallpaper="./wallpaper.jpg",
-        wallpaper_mode="fill",
         bottom=bar.Gap(10),
         left=bar.Gap(10),
         right=bar.Gap(10),
