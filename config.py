@@ -3,76 +3,53 @@ from typing import List  # noqa: F401
 from libqtile import bar, layout, widget, qtile
 from libqtile.config import Click, Drag, Group, Key, Match, Screen
 from libqtile.lazy import lazy
-from libqtile.utils import guess_terminal
 
 mod = "mod4"
-terminal = guess_terminal()
-# --- Keybindings ---
-
-
-def open_pavu():
-    qtile.cmd_spawn("pavucontrol")
 
 
 def open_powermenu():
     qtile.cmd_spawn("powermenu.sh")
 
 
+def open_pavu():
+    qtile.cmd_spawn("pavucontrol")
+
+
 keys = [
     # --------------------------- Switch windows/layouts ----------------------
-    Key([mod], "h", lazy.layout.left(), desc="Move focus to left"),
-    Key([mod], "l", lazy.layout.right(), desc="Move focus to right"),
-    Key([mod], "j", lazy.layout.down(), desc="Move focus down"),
-    Key([mod], "k", lazy.layout.up(), desc="Move focus up"),
-    Key([mod, "shift"], "f", lazy.window.toggle_fullscreen(), desc="toggle fullscreen"),
-    Key([mod], "space", lazy.window.toggle_floating(), desc="toggle floating"),
-    Key([mod], "Tab", lazy.next_layout(), desc="Toggle between layouts"),
+    Key([mod], "h", lazy.layout.left()),
+    Key([mod], "l", lazy.layout.right()),
+    Key([mod], "j", lazy.layout.down()),
+    Key([mod], "k", lazy.layout.up()),
+    Key([mod, "shift"], "f", lazy.window.toggle_fullscreen()),
+    Key([mod, "shift"], "space", lazy.window.toggle_floating()),
+    Key([mod], "Tab", lazy.next_layout()),
+
     # --------------------- Shuffle windows ---------------------------------
-    Key(
-        [mod, "shift"],
-        "h",
-        lazy.layout.shuffle_left(),
-        desc="Move window to the left",
-    ),
-    Key(
-        [mod, "shift"],
-        "l",
-        lazy.layout.shuffle_right(),
-        desc="Move window to the right",
-    ),
-    Key([mod, "shift"], "j", lazy.layout.shuffle_down(), desc="Move window down"),
-    Key([mod, "shift"], "k", lazy.layout.shuffle_up(), desc="Move window up"),
+    Key([mod, "shift"], "h", lazy.layout.swap_left()),
+    Key([mod, "shift"], "l", lazy.layout.swap_right()),
+    Key([mod, "shift"], "j", lazy.layout.shuffle_down()),
+    Key([mod, "shift"], "k", lazy.layout.shuffle_up()),
+
     # -------------------------- Resize windows ---------------------------
-    Key(
-        [mod, "control"],
-        "h",
-        lazy.layout.grow_left(),
-        desc="Grow window to the left",
-    ),
-    Key(
-        [mod, "control"],
-        "l",
-        lazy.layout.grow_right(),
-        desc="Grow window to the right",
-    ),
-    Key([mod, "control"], "j", lazy.layout.grow_down(), desc="Grow window down"),
-    Key([mod, "control"], "k", lazy.layout.grow_up(), desc="Grow window up"),
-    Key([mod], "n", lazy.layout.normalize(), desc="Reset all window sizes"),
+    Key([mod, "control"], "j", lazy.layout.grow()),
+    Key([mod, "control"], "k", lazy.layout.shrink()),
+    Key([mod], "o", lazy.layout.maximize()),
+    Key([mod], "n", lazy.layout.normalize()),
+    Key([mod], "space", lazy.layout.flip()),
+
     # ------------ Restart,Shutdown & Kill------------------------------
-    Key([mod, "control"], "r", lazy.restart(), desc="Restart Qtile"),
-    Key([mod], "q", lazy.window.kill(), desc="Kill focused window"),
-    Key([mod, "shift"], "x", lazy.spawn("powermenu.sh"), desc="Kill focused window"),
+    Key([mod, "control"], "r", lazy.restart()),
+    Key([mod], "q", lazy.window.kill()),
+    Key([mod, "shift"], "x", lazy.spawn("powermenu.sh")),
+
     # -------------------------Spawn apps/programs-----------------------------
-    Key([mod], "Return", lazy.spawn(terminal), desc="Spawn a terminal"),
-    Key([mod], "d", lazy.spawn("rofi -show drun"), desc="Spawn rofi"),
-    Key([mod], "e", lazy.spawn("rofi -show emoji"), desc="Spawn emoji menu"),
-    Key(
-        [mod],
-        "c",
-        lazy.spawn("rofi -show calc -modi calc -no-show-match -no-sort"),
-        desc="Spawn rofi",
-    ),
-    Key([mod], "w", lazy.spawn("firefox"), desc="Spawn firefox"),
+    Key([mod], "Return", lazy.spawn("kitty")),
+    Key([mod], "d", lazy.spawn("rofi -show drun")),
+    Key([mod], "e", lazy.spawn("rofi -show emoji")),
+    Key([mod], "c", lazy.spawn("rofi -show calc -modi calc -no-show-match -no-sort")),
+    Key([mod], "w", lazy.spawn("firefox")),
+
     # -----------------------Sound and brightness----------------------------
     Key([], "XF86AudioMute", lazy.spawn("pamixer -t")),
     Key([], "XF86AudioLowerVolume", lazy.spawn("pamixer -d 5")),
@@ -86,9 +63,21 @@ keys = [
     Key([], "XF86MonBrightnessUp", lazy.spawn("xbacklight -inc 5")),
     Key([], "XF86MonBrightnessDown", lazy.spawn("xbacklight -dec 5")),
 ]
+
 # ---------------------------------- Groups --------------------------------
 
-groups = [Group(i) for i in "123456789"]
+groups = [
+    Group("1"),
+    Group("2"),
+    Group("3"),
+    Group("4"),
+    Group("5"),
+    Group("6"),
+    Group("7"),
+    Group("8"),
+    Group("9"),
+]
+
 
 for i in groups:
     keys.extend(
@@ -105,53 +94,45 @@ for i in groups:
                 [mod, "shift"],
                 i.name,
                 lazy.window.togroup(i.name, switch_group=True),
-                desc="Switch to & move focused window to group {}".format(i.name),
+                desc="Switch & move focused window to group {}".format(i.name),
             ),
         ]
     )
+
 # --------------------------------- Colors -------------------------------
+
 
 def init_colors():
     return [
-        ["#15161E", "#282a36"],  # color 0 | bg
-        ["#545c7e", "#545c7e"],  # color 1 | bg
-        ["#f8f8f2", "#f8f8f2"],  # color 2 | fg
-        ["#f7768e", "#ff5555"],  # color 3 | red
-        ["#9ece6a", "#50fa7b"],  # color 4 | green
-        ["#e0af68", "#f1fa8c"],  # color 5 | yellow
-        ["#bb9af7", "#bd93f9"],  # color 6 | blue
-        ["#7aa2f7", "#ff79c6"],  # color 7 | magenta
-        ["#7dcfff", "#8be9fd"],  # color 8 | cyan
-        ["#a9b1d6", "#bbbbbb"],
-    ]  # color 9 | white
+        ["#161320", "#161320"],
+        ["#6E6C7E", "#6E6C7E"],
+        ["#D9E0EE", "#D9E0EE"],
+        ["#E8A2AF", "#E8A2AF"],
+        ["#ABE9B3", "#ABE9B3"],
+        ["#DDB6F2", "#DDB6F2"],
+        ["#F28FAD", "#F28FAD"],
+        ["#96CDFB", "#96CDFB"],
+        ["#89DCEB", "#89DCEB"],
+        ["#F5C2E7", "#F5C2E7"],
+    ]
 
 
 colors = init_colors()
+
 # -------------------------------Layouts------------------------------------
 layout_theme = {
     "border_width": 3,
-    "margin": 15,
+    "margin": 20,
     "font": "JetBrainsMono Nerd Font",
     "font_size": 10,
-    "border_focus": colors[6],
+    "border_focus": colors[7],
     "border_normal": colors[9],
 }
 
 # window layouts
 layouts = [
     layout.MonadTall(**layout_theme),
-    layout.Max(**layout_theme),
     layout.Floating(**layout_theme),
-    layout.Stack(num_stacks=2, **layout_theme),
-    layout.Bsp(**layout_theme),
-    layout.Tile(**layout_theme),
-    # layout.Columns(**layout_theme),
-    # layout.Matrix(**layout_theme),
-    # layout.MonadWide(**layout_theme),
-    # layout.RatioTile(**layout_theme),
-    # layout.TreeTab(**layout_theme),
-    # layout.VerticalTile(**layout_theme),
-    # layout.Zoomy(**layout_theme),
 ]
 
 floating_layout = layout.Floating(
@@ -164,6 +145,7 @@ floating_layout = layout.Floating(
         Match(title="branchdialog"),  # gitk
         Match(title="pinentry"),  # GPG key password entry
         Match(wm_class="pavucontrol"),  # pavucontrol
+        # Match(wm_name="NoiseTorch"),  # NoiseTorch
     ],
     **layout_theme
 )
@@ -181,7 +163,7 @@ group_box_options = {
     "inactive": colors[1],
     "spacing": 5,
     "rounded": True,
-    "this_current_screen_border": colors[6],
+    "this_current_screen_border": colors[7],
     "font": "JetBrainsMono Nerd Font",
 }
 
@@ -201,16 +183,9 @@ screens = [
                     linewidth=0,
                     padding=10,
                 ),
-                widget.CurrentLayout(
-                    font="JetBrainsMono Nerd Font",
-                    foreground=colors[7],
-                ),
-                widget.Sep(
-                    linewidth=0,
-                    padding=10,
-                ),
                 widget.WindowName(
                     font="JetBrainsMono Nerd Font",
+                    fontsize=13
                 ),
                 widget.Systray(
                     padding=10,
@@ -225,10 +200,11 @@ screens = [
                     format=" {essid}",
                     fontsize="18",
                     padding=5,
+                    foreground=colors[8]
                 ),
                 widget.Sep(
                     linewidth=0,
-                    padding=10,
+                    padding=5,
                 ),
                 widget.Battery(
                     charge_char="",
@@ -236,6 +212,7 @@ screens = [
                     full_char="",
                     font="JetBrainsMono Nerd Font",
                     format="{char} {percent:2.0%}",
+                    foreground=colors[4]
                 ),
                 widget.Sep(
                     linewidth=0,
@@ -245,12 +222,14 @@ screens = [
                     text=" ",
                     font="JetBrainsMono Nerd Font",
                     fontsize=16,
+                    foreground=colors[5]
                 ),
                 widget.PulseVolume(
                     limit_max_volume="True",
                     update_interval=0.1,
                     mouse_callbacks={"Button3": open_pavu},
                     fontsize=18,
+                    foreground=colors[5]
                 ),
                 widget.Sep(
                     linewidth=0,
@@ -260,10 +239,12 @@ screens = [
                     text=" ",
                     font="Font Awesome",
                     fontsize=16,
+                    foreground=colors[6]
                 ),
                 widget.Clock(
                     format="%A %b %d",
                     fontsize=18,
+                    foreground=colors[6]
                 ),
                 widget.Sep(
                     linewidth=0,
@@ -273,10 +254,12 @@ screens = [
                     text="",
                     font="Font Awesome",
                     fontsize=16,
+                    foreground=colors[7]
                 ),
                 widget.Clock(
                     format="%H:%M",
                     fontsize=18,
+                    foreground=colors[7]
                 ),
                 widget.Sep(
                     linewidth=0,
@@ -292,11 +275,11 @@ screens = [
                 ),
             ],
             30,
-            margin=[10, 10, 10, 10],
+            margin=[10, 10, -10, 10],
         ),
-        bottom=bar.Gap(10),
-        left=bar.Gap(10),
-        right=bar.Gap(10),
+        bottom=bar.Gap(-15),
+        left=bar.Gap(-15),
+        right=bar.Gap(-15),
     ),
 ]
 # Drag floating layouts.
