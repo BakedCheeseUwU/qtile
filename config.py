@@ -1,14 +1,18 @@
 from typing import List  # noqa: F401
 
 from libqtile import bar, layout, widget, qtile
-from libqtile.config import Click, Drag, Group, Key, Match, Screen
+from libqtile.config import Click, Drag, Group, Key, Match, Screen, ScratchPad, DropDown
 from libqtile.lazy import lazy
 
 mod = "mod4"
 
 
 def open_powermenu():
-    qtile.cmd_spawn("powermenu.sh")
+    qtile.cmd_spawn("rofi -show power-menu -modi power-menu:rofi-power-menu")
+
+
+def open_wifimenu():
+    qtile.cmd_spawn("rofi-wifi-menu.sh")
 
 
 def open_pavu():
@@ -41,12 +45,12 @@ keys = [
     # ------------ Restart,Shutdown & Kill------------------------------
     Key([mod, "control"], "r", lazy.restart()),
     Key([mod], "q", lazy.window.kill()),
-    Key([mod, "shift"], "x", lazy.spawn("powermenu.sh")),
+    Key([mod, "shift"], "x", lazy.spawn("rofi -show power-menu -modi power-menu:rofi-power-menu")),
 
     # -------------------------Spawn apps/programs-----------------------------
     Key([mod], "Return", lazy.spawn("kitty")),
     Key([mod], "d", lazy.spawn("rofi -show drun")),
-    Key([mod], "e", lazy.spawn("rofi -show emoji")),
+    Key([mod], "e", lazy.spawn("rofi -show emoji -modi emoji")),
     Key([mod], "c", lazy.spawn("rofi -show calc -modi calc -no-show-match -no-sort")),
     Key([mod], "w", lazy.spawn("firefox")),
 
@@ -96,9 +100,22 @@ for i in groups:
                 lazy.window.togroup(i.name, switch_group=True),
                 desc="Switch & move focused window to group {}".format(i.name),
             ),
+            Key(["mod1"], 'Return', lazy.group['scratchpad'].dropdown_toggle('kitty')),
+            Key(["mod1"], 'p', lazy.group['scratchpad'].dropdown_toggle('music')),
+            Key(["mod1"], 'm', lazy.group['scratchpad'].dropdown_toggle('mixer')),
+            Key(["mod1"], 'n', lazy.group['scratchpad'].dropdown_toggle('nnn')),
         ]
     )
 
+groups.append(
+    ScratchPad("scratchpad", [
+        DropDown("kitty", 'kitty', y=0.15, height=0.70, width=0.80, opacity=1),
+        DropDown("music", 'kitty ncmpcpp', y=0.15, height=0.70, width=0.80, opacity=1),
+        DropDown("nnn", 'kitty nnn -d -C', y=0.15, height=0.70, width=0.80, opacity=1),
+        DropDown("mixer", 'kitty pulsemixer', y=0.15, height=0.70, width=0.80, opacity=1),
+
+    ]),
+)
 # --------------------------------- Colors -------------------------------
 
 
@@ -145,7 +162,6 @@ floating_layout = layout.Floating(
         Match(title="branchdialog"),  # gitk
         Match(title="pinentry"),  # GPG key password entry
         Match(wm_class="pavucontrol"),  # pavucontrol
-        # Match(wm_name="NoiseTorch"),  # NoiseTorch
     ],
     **layout_theme
 )
@@ -183,10 +199,7 @@ screens = [
                     linewidth=0,
                     padding=10,
                 ),
-                widget.WindowName(
-                    font="JetBrainsMono Nerd Font",
-                    fontsize=13
-                ),
+                widget.WindowName(font="JetBrainsMono Nerd Font", fontsize=13),
                 widget.Systray(
                     padding=10,
                 ),
@@ -200,7 +213,8 @@ screens = [
                     format=" {essid}",
                     fontsize="18",
                     padding=5,
-                    foreground=colors[8]
+                    foreground=colors[8],
+                    mouse_callbacks={"Button1": open_wifimenu},
                 ),
                 widget.Sep(
                     linewidth=0,
@@ -212,7 +226,7 @@ screens = [
                     full_char="",
                     font="JetBrainsMono Nerd Font",
                     format="{char} {percent:2.0%}",
-                    foreground=colors[4]
+                    foreground=colors[4],
                 ),
                 widget.Sep(
                     linewidth=0,
@@ -222,45 +236,31 @@ screens = [
                     text=" ",
                     font="JetBrainsMono Nerd Font",
                     fontsize=16,
-                    foreground=colors[5]
+                    foreground=colors[5],
                 ),
                 widget.PulseVolume(
                     limit_max_volume="True",
                     update_interval=0.1,
                     mouse_callbacks={"Button3": open_pavu},
                     fontsize=18,
-                    foreground=colors[5]
+                    foreground=colors[5],
                 ),
                 widget.Sep(
                     linewidth=0,
                     padding=10,
                 ),
                 widget.TextBox(
-                    text=" ",
-                    font="Font Awesome",
-                    fontsize=16,
-                    foreground=colors[6]
+                    text=" ", font="Font Awesome", fontsize=16, foreground=colors[6]
                 ),
-                widget.Clock(
-                    format="%A %b %d",
-                    fontsize=18,
-                    foreground=colors[6]
-                ),
+                widget.Clock(format="%A %b %d", fontsize=18, foreground=colors[6]),
                 widget.Sep(
                     linewidth=0,
                     padding=10,
                 ),
                 widget.TextBox(
-                    text="",
-                    font="Font Awesome",
-                    fontsize=16,
-                    foreground=colors[7]
+                    text="", font="Font Awesome", fontsize=16, foreground=colors[7]
                 ),
-                widget.Clock(
-                    format="%H:%M",
-                    fontsize=18,
-                    foreground=colors[7]
-                ),
+                widget.Clock(format="%H:%M", fontsize=18, foreground=colors[7]),
                 widget.Sep(
                     linewidth=0,
                     padding=10,
@@ -277,9 +277,9 @@ screens = [
             30,
             margin=[10, 10, -10, 10],
         ),
-        bottom=bar.Gap(-15),
-        left=bar.Gap(-15),
-        right=bar.Gap(-15),
+        bottom=bar.Gap(-13),
+        left=bar.Gap(-13),
+        right=bar.Gap(-13),
     ),
 ]
 # Drag floating layouts.
